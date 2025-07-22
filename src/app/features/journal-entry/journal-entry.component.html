@@ -1,0 +1,107 @@
+<h2 class="text-2xl font-bold text-blue-800 mb-4">Asientos Contables</h2>
+
+<!-- Botón para agregar nuevo asiento -->
+<button class="mb-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition" (click)="toggleForm()">
+  {{ showForm ? (isEditing ? 'Cancelar edición' : 'Cancelar') : 'Agregar Asiento' }}
+</button>
+
+<!-- Formulario de Asiento Contable -->
+<div *ngIf="showForm" class="mb-6 bg-white p-6 rounded shadow">
+  <h3 class="text-lg font-semibold mb-4">
+    {{ isEditing ? 'Editar asiento contable' : 'Agregar asiento contable' }}
+  </h3>
+
+  <form (ngSubmit)="save()" #journalForm="ngForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+    <div>
+      <label class="block font-medium">Período Contable</label>
+      <select class="w-full border px-3 py-2 rounded" [(ngModel)]="form.accountingPeriodId" name="accountingPeriodId" required>
+        <option *ngFor="let period of periods" [value]="period.id">{{ period.name }}</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block font-medium">Fecha de Entrada</label>
+      <input class="w-full border px-3 py-2 rounded" type="date" [(ngModel)]="form.entryDate" name="entryDate" required />
+    </div>
+
+    <div>
+      <label class="block font-medium">Descripción</label>
+      <input class="w-full border px-3 py-2 rounded" type="text" placeholder="Descripción" [(ngModel)]="form.description" name="description" />
+    </div>
+
+    <!-- Tabla de Detalles dentro del formulario -->
+    <div class="md:col-span-2 mt-4">
+      <h3 class="text-lg font-semibold mt-4 mb-2">Detalles del Asiento Contable</h3>
+      <table class="min-w-full border border-gray-300 rounded-lg shadow">
+        <thead class="bg-gray-700 text-white">
+          <tr>
+            <th class="px-4 py-2">Cuenta</th>
+            <th class="px-4 py-2">Descripción</th>
+            <th class="px-4 py-2">Débito</th>
+            <th class="px-4 py-2">Crédito</th>
+            <th class="px-4 py-2">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let detail of details; let i = index" class="bg-white even:bg-gray-50">
+            <td class="text-center px-4 py-2">
+              <select [(ngModel)]="detail.accountId" name="accountId-{{i}}" required class="w-full border px-3 py-2 rounded">
+                <option *ngFor="let account of accounts" [value]="account.id">{{ account.name }}</option>
+              </select>
+            </td>
+            <td class="text-center px-4 py-2">
+              <input class="w-full border px-3 py-2 rounded" type="text" [(ngModel)]="detail.description" name="description-{{i}}" />
+            </td>
+            <td class="text-center px-4 py-2">
+              <input class="w-full border px-3 py-2 rounded text-right" type="number" step="0.01" [(ngModel)]="detail.debitAmount" name="debitAmount-{{i}}" />
+            </td>
+            <td class="text-center px-4 py-2">
+              <input class="w-full border px-3 py-2 rounded text-right" type="number" step="0.01" [(ngModel)]="detail.creditAmount" name="creditAmount-{{i}}" />
+            </td>
+            <td class="text-center px-4 py-2">
+              <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" type="button" (click)="removeDetail(i)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" (click)="addDetail()">Agregar Detalle</button>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="md:col-span-2 flex justify-end gap-2 mt-4">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        {{ isEditing ? 'Actualizar' : 'Guardar' }}
+      </button>
+      <button type="button" (click)="resetForm()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
+    </div>
+  </form>
+</div>
+
+<!-- Tabla de Asientos Contables -->
+<table *ngIf="!loading && entries.length" class="min-w-full border border-gray-300 rounded-lg shadow mt-6">
+  <thead class="bg-blue-600 text-white">
+    <tr>
+      <th class="px-4 py-2">Fecha</th>
+      <th class="px-4 py-2">Descripción</th>
+      <th class="px-4 py-2">Débitos</th>
+      <th class="px-4 py-2">Créditos</th>
+      <th class="px-4 py-2">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let entry of entries" class="bg-white even:bg-gray-50">
+      <td class="text-center px-4 py-2">{{ entry.entryDate }}</td>
+      <td class="text-center px-4 py-2">{{ entry.description }}</td>
+      <td class="text-center px-4 py-2">{{ entry.totalDebits }}</td>
+      <td class="text-center px-4 py-2">{{ entry.totalCredits }}</td>
+      <td class="text-center px-4 py-2 space-x-2">
+        <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600" (click)="edit(entry)">Editar</button>
+        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" (click)="delete(entry.id)">Eliminar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p *ngIf="!loading && !entries.length" class="mt-4 text-gray-600">No hay asientos contables registrados.</p>
+<p *ngIf="loading" class="mt-4 text-gray-600">Cargando datos...</p>

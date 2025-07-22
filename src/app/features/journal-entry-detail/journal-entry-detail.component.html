@@ -1,0 +1,50 @@
+<h3 class="text-lg font-semibold mt-4 mb-2">Líneas del Asiento</h3>
+
+<form (ngSubmit)="save()" class="grid grid-cols-6 gap-2 items-end mb-4">
+  <div class="col-span-2">
+    <label>Cuenta</label>
+    <input type="number" [(ngModel)]="form.accountId" name="accountId" required class="w-full border px-2 py-1 rounded" />
+  </div>
+  <div class="col-span-2">
+    <label>Descripción</label>
+    <input type="text" [(ngModel)]="form.description" name="description" class="w-full border px-2 py-1 rounded" />
+  </div>
+  <div>
+    <label>Débito</label>
+    <input type="number" [(ngModel)]="form.debitAmount" name="debitAmount" class="w-full border px-2 py-1 rounded" />
+  </div>
+  <div>
+    <label>Crédito</label>
+    <input type="number" [(ngModel)]="form.creditAmount" name="creditAmount" class="w-full border px-2 py-1 rounded" />
+  </div>
+  <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded col-span-6 md:col-span-1">Agregar</button>
+</form>
+
+<table class="w-full border mt-2">
+  <thead class="bg-gray-100">
+    <tr>
+      <th>Cuenta</th>
+      <th>Descripción</th>
+      <th>Débito</th>
+      <th>Crédito</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let detail of details">
+      <td>{{ detail.accountId }}</td>
+      <td>{{ detail.description }}</td>
+      <td>{{ detail.debitAmount | number:'1.2-2' }}</td>
+      <td>{{ detail.creditAmount | number:'1.2-2' }}</td>
+      <td>
+        <button (click)="delete(detail.id)" class="bg-red-500 text-white px-2 py-1 rounded">Eliminar</button>
+      </td>
+    </tr>
+    <tr class="font-bold bg-blue-50">
+      <td colspan="2">Totales</td>
+      <td>{{ totalDebits | number:'1.2-2' }}</td>
+      <td>{{ totalCredits | number:'1.2-2' }}</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
