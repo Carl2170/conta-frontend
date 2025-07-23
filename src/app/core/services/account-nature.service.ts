@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GraphQLClient, gql } from 'graphql-request';
 import { Observable, from } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface AccountNature {
   id: number;
@@ -12,7 +13,8 @@ export interface AccountNature {
   providedIn: 'root',
 })
 export class AccountNatureService {
-  private endpoint = 'http://localhost:8002/graphql';
+  // private endpoint = 'http://localhost:8002/graphql';
+  private endpoint = environment.graphqlEndpoint;
   private client = new GraphQLClient(this.endpoint);
 
   private GET_ALL_ACCOUNT_NATURES = gql`
