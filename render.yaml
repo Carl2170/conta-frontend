@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: sw-contable-client-app
+    env: node
+    buildCommand: npm run build
+    startCommand: npm run start
+    staticPublishPath: dist/sw-contable-client-app/browser
