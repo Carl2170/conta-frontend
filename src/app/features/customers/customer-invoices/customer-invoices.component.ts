@@ -8,7 +8,7 @@ import  { Customer } from "../../../core/models/customers/customer.model"
 import { HttpClientModule } from "@angular/common/http"
 import { CommonModule } from "@angular/common"
 import {
-  type InvoiceStatus,
+  InvoiceStatus,
   InvoiceStatusOptions,
   InvoiceStatusLabels,
   InvoiceStatusClasses,
@@ -310,5 +310,10 @@ export class CustomerInvoicesComponent implements OnInit {
 
   getStatusLabel(status: InvoiceStatus): string {
     return InvoiceStatusLabels[status] || status
+  }
+
+   getAmountClass(amount: string): string {
+    const value = parseFloat(amount || '0')
+    return value > 0 ? 'text-red-600' : 'text-green-600'
   }
 }

@@ -33,6 +33,10 @@ export class HomeLayoutComponent {
   goToJournalEntryDetail(id: string) {
     this.router.navigate(['/dashboard/journal-entry', id]);
   }
+
+  goToCustomers() {
+    this.router.navigate(['/dashboard/customers']);
+  }
   
 
   goToHome() {

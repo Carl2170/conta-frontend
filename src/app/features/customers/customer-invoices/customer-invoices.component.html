@@ -256,7 +256,7 @@
                 Pagado: {{ formatCurrency(invoice.paidAmount) }}
               </div>
               <div class="text-sm" 
-                   [class]="parseFloat(invoice.pendingAmount) > 0 ? 'text-red-600' : 'text-green-600'">
+                   [class]="getAmountClass(invoice.pendingAmount)">
                 Pendiente: {{ formatCurrency(invoice.pendingAmount) }}
               </div>
             </td>
