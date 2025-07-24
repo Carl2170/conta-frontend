@@ -1,0 +1,165 @@
+<div class="container mx-auto px-4 py-6 max-w-2xl">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">
+      {{ isEditMode ? 'Editar Cliente' : 'Nuevo Cliente' }}
+    </h1>
+    <p class="text-gray-600 mt-1">
+      {{ isEditMode ? 'Modifique los datos del cliente' : 'Complete la información del nuevo cliente' }}
+    </p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <form [formGroup]="customerForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Código -->
+        <div class="md:col-span-1">
+          <label for="code" class="block text-sm font-medium text-gray-700 mb-2">
+            Código
+          </label>
+          <input
+            type="text"
+            id="code"
+            formControlName="code"
+            placeholder="Código del cliente (opcional)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="isFieldInvalid('code')">
+          <p *ngIf="isFieldInvalid('code')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('code') }}
+          </p>
+        </div>
+
+        <!-- Nombre -->
+        <div class="md:col-span-1">
+          <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+            Nombre <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            placeholder="Nombre completo del cliente"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="isFieldInvalid('name')">
+          <p *ngIf="isFieldInvalid('name')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('name') }}
+          </p>
+        </div>
+
+        <!-- Tipo de Documento -->
+        <div class="md:col-span-1">
+          <label for="documentType" class="block text-sm font-medium text-gray-700 mb-2">
+            Tipo de Documento
+          </label>
+          <select
+            id="documentType"
+            formControlName="documentType"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value="">Seleccione un tipo</option>
+            <option *ngFor="let type of documentTypes" [value]="type.value">
+              {{ type.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Número de Documento -->
+        <div class="md:col-span-1">
+          <label for="documentNumber" class="block text-sm font-medium text-gray-700 mb-2">
+            Número de Documento
+          </label>
+          <input
+            type="text"
+            id="documentNumber"
+            formControlName="documentNumber"
+            placeholder="Número de documento"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Email -->
+        <div class="md:col-span-1">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="correo@ejemplo.com"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            [class.border-red-500]="isFieldInvalid('email')">
+          <p *ngIf="isFieldInvalid('email')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('email') }}
+          </p>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="md:col-span-1">
+          <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
+            Teléfono
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            formControlName="phone"
+            placeholder="Número de teléfono"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Dirección -->
+        <div class="md:col-span-2">
+          <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+            Dirección
+          </label>
+          <textarea
+            id="address"
+            formControlName="address"
+            rows="3"
+            placeholder="Dirección completa del cliente"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+        </div>
+
+        <!-- Estado Activo -->
+        <div class="md:col-span-2">
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="isActive"
+              formControlName="isActive"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+            <label for="isActive" class="ml-2 block text-sm text-gray-700">
+              Cliente activo
+            </label>
+          </div>
+          <p class="mt-1 text-sm text-gray-500">
+            Los clientes inactivos no aparecerán en las búsquedas por defecto
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="submitting || customerForm.invalid"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          <div *ngIf="submitting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          {{ isEditMode ? 'Actualizar' : 'Crear' }} Cliente
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

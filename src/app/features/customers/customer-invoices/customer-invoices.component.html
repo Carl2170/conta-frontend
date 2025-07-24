@@ -1,0 +1,318 @@
+<div class="container mx-auto px-4 py-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-4">
+      <button
+        (click)="goBack()"
+        class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Facturas</h1>
+        <p class="text-gray-600 mt-1" *ngIf="customer">
+          Cliente: {{ customer.name }} ({{ customer.code }})
+        </p>
+      </div>
+    </div>
+    <button
+      (click)="showNewInvoiceForm()"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Nueva Factura
+    </button>
+  </div>
+
+  <!-- Invoice Form Modal -->
+  <div *ngIf="showInvoiceForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-900">
+            {{ editingInvoice ? 'Editar Factura' : 'Nueva Factura' }}
+          </h2>
+          <button
+            (click)="cancelInvoiceForm()"
+            class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <form [formGroup]="invoiceForm" (ngSubmit)="onSubmitInvoice()">
+          <!-- Invoice Header -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Número de Factura
+              </label>
+              <input
+                type="text"
+                formControlName="invoiceNumber"
+                placeholder="Se generará automáticamente"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Fecha de Factura <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                formControlName="invoiceDate"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Fecha de Vencimiento
+              </label>
+              <input
+                type="date"
+                formControlName="dueDate"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+          </div>
+
+          <!-- Invoice Details -->
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-medium text-gray-900">Detalles de la Factura</h3>
+              <button
+                type="button"
+                (click)="addDetail()"
+                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Agregar Línea
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full border border-gray-200 rounded-lg">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio Unit.</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="details">
+                  <tr *ngFor="let detail of detailsArray.controls; let i = index" [formGroupName]="i" class="border-t border-gray-200">
+                    <td class="px-4 py-3">
+                      <input
+                        type="text"
+                        formControlName="description"
+                        placeholder="Descripción del producto/servicio"
+                        class="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+                    </td>
+                    <td class="px-4 py-3">
+                      <input
+                        type="number"
+                        formControlName="quantity"
+                        min="0.01"
+                        step="0.01"
+                        class="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+                    </td>
+                    <td class="px-4 py-3">
+                      <input
+                        type="number"
+                        formControlName="unitPrice"
+                        min="0.01"
+                        step="0.01"
+                        class="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+                    </td>
+                    <td class="px-4 py-3 text-right font-medium">
+                      {{ formatCurrency(calculateDetailTotal(i)) }}
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                      <button
+                        type="button"
+                        (click)="removeDetail(i)"
+                        [disabled]="detailsArray.length <= 1"
+                        class="text-red-600 hover:text-red-900 disabled:text-gray-400 disabled:cursor-not-allowed">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Invoice Totals -->
+          <div class="flex justify-end mb-6">
+            <div class="w-64 space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Subtotal:</span>
+                <span class="font-medium">{{ formatCurrency(calculateSubtotal()) }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <label class="text-gray-600">Impuestos:</label>
+                <input
+                  type="number"
+                  formControlName="taxAmount"
+                  min="0"
+                  step="0.01"
+                  class="w-24 px-2 py-1 border border-gray-300 rounded text-right focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div class="flex justify-between text-lg font-bold border-t pt-2">
+                <span>Total:</span>
+                <span>{{ formatCurrency(calculateTotal()) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex justify-end gap-4">
+            <button
+              type="button"
+              (click)="cancelInvoiceForm()"
+              class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="submitting || invoiceForm.invalid"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+              <div *ngIf="submitting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              {{ editingInvoice ? 'Actualizar' : 'Crear' }} Factura
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+    <div class="flex flex-col sm:flex-row gap-4">
+      <div class="flex-1">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+          placeholder="Buscar por número de factura..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+      <div>
+        <select
+          [(ngModel)]="statusFilter"
+          (change)="onStatusFilterChange()"
+          class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+      <button
+        (click)="onSearch()"
+        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Invoices Table -->
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fechas</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montos</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let invoice of filteredInvoices" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ invoice.invoiceNumber }}</div>
+              <div class="text-sm text-gray-500">ID: {{ invoice.id }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">Emisión: {{ formatDate(invoice.invoiceDate) }}</div>
+              <div class="text-sm text-gray-500" *ngIf="invoice.dueDate">
+                Vence: {{ formatDate(invoice.dueDate) }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ formatCurrency(invoice.totalAmount) }}</div>
+              <div class="text-sm text-gray-500">
+                Pagado: {{ formatCurrency(invoice.paidAmount) }}
+              </div>
+              <div class="text-sm" 
+                   [class]="parseFloat(invoice.pendingAmount) > 0 ? 'text-red-600' : 'text-green-600'">
+                Pendiente: {{ formatCurrency(invoice.pendingAmount) }}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                    [class]="getStatusClass(invoice.status)">
+                {{ getStatusLabel(invoice.status) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <div class="flex justify-end gap-2">
+                <button
+                  (click)="navigateToPayments(invoice.id)"
+                  class="text-green-600 hover:text-green-900 p-1 rounded"
+                  title="Ver Pagos">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                </button>
+                <button
+                  (click)="editInvoice(invoice)"
+                  class="text-indigo-600 hover:text-indigo-900 p-1 rounded"
+                  title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </button>
+                <button
+                  (click)="deleteInvoice(invoice)"
+                  class="text-red-600 hover:text-red-900 p-1 rounded"
+                  title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredInvoices.length === 0" class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No hay facturas</h3>
+      <p class="mt-1 text-sm text-gray-500">Comience creando una nueva factura para este cliente.</p>
+      <div class="mt-6">
+        <button
+          (click)="showNewInvoiceForm()"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+          Crear Factura
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
