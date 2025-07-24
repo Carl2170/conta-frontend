@@ -2,12 +2,13 @@ import { Injectable } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
 import type { Observable } from "rxjs"
 import type { CustomerInput } from "../models/customers/customer.model"
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: "root",
 })
 export class CustomerService {
-  private readonly graphqlUrl = "http://localhost:8080/graphql"
+  private readonly graphqlUrl = environment.graphqlEndpoint;
 
   constructor(private http: HttpClient) {}
 

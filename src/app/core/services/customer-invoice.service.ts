@@ -3,11 +3,13 @@ import { HttpClient } from "@angular/common/http"
 import type { Observable } from "rxjs"
 import { CustomerInvoiceInput } from "../models/customers/customer-invoice.model"
 import { InvoiceStatus } from "../models/customers/invoice-status.enum"
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: "root",
 })
 export class CustomerInvoiceService {
-  private readonly graphqlUrl = "http://localhost:8080/graphql"
+  private readonly graphqlUrl = environment.graphqlEndpoint;
 
   constructor(private http: HttpClient) {}
 

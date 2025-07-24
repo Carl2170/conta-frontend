@@ -26,11 +26,46 @@ export const routes: Routes = [
       { path: 'journal-entry', component: JournalEntryComponent },
       { path: 'journal-entry/:id', component: JournalEntryDetailComponent },
 
-      { path: 'customers', component: CustomerListComponent },
-      { path: 'customers/new', component: CustomerFormComponent },
-      { path: 'customers/edit/:id', component: CustomerFormComponent },
-      { path: 'customers/:id/invoices', component: CustomerInvoicesComponent },
-      { path: 'customers/:id/payments', component: CustomerPaymentsComponent },
+      // { path: 'customers', component: CustomerListComponent },
+      // { path: 'customers/new', component: CustomerFormComponent },
+      // { path: 'customers/edit/:id', component: CustomerFormComponent },
+      // { path: 'customers/:id/invoices', component: CustomerInvoicesComponent },
+      // { path: 'customers/:id/payments', component: CustomerPaymentsComponent },
+      {
+        path: 'customers',
+        loadComponent: () =>
+          import(
+            './features/customers/customer-list/customer-list.component'
+          ).then((m) => m.CustomerListComponent),
+      },
+      {
+        path: 'customers/new',
+        loadComponent: () =>
+          import(
+            './features/customers/customer-form/customer-form.component'
+          ).then((m) => m.CustomerFormComponent),
+      },
+      {
+        path: 'customers/edit/:id',
+        loadComponent: () =>
+          import(
+            './features/customers/customer-form/customer-form.component'
+          ).then((m) => m.CustomerFormComponent),
+      },
+      {
+        path: 'customers/:id/invoices',
+        loadComponent: () =>
+          import(
+            './features/customers/customer-invoices/customer-invoices.component'
+          ).then((m) => m.CustomerInvoicesComponent),
+      },
+      {
+        path: 'customers/:id/payments',
+        loadComponent: () =>
+          import(
+            './features/customers/customer-payments/customer-payments.component'
+          ).then((m) => m.CustomerPaymentsComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },
