@@ -1,5 +1,5 @@
 import { Component, type OnInit } from "@angular/core"
-import  { Router } from "@angular/router"
+import  { RouterModule, Router } from "@angular/router"
 import  { CustomerService } from "../../../core/services/customer.service"
 import  { Customer } from "../../../core/models/customers/customer.model"
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ import { NgIf, NgFor } from '@angular/common';
 @Component({
   selector: "app-customer-list",
   standalone: true,
-  imports: [CommonModule, NgFor, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, NgFor, FormsModule, ReactiveFormsModule, NgIf, RouterModule],
   templateUrl: "./customer-list.component.html",
   styleUrls: ["./customer-list.component.css"],
 })
@@ -74,20 +74,22 @@ export class CustomerListComponent implements OnInit {
     this.loadCustomers()
   }
 
-  navigateToNew(): void {
-    this.router.navigate(["/customers/new"])
+  navigateToNew() {
+    console.log("Navigating to new customer form");
+    
+    this.router.navigate(["dashboard/customers/new"])
   }
 
   navigateToEdit(id: number): void {
-    this.router.navigate(["/customers/edit", id])
+    this.router.navigate(["dashboard/customers/edit", id])
   }
 
   navigateToInvoices(id: number): void {
-    this.router.navigate(["/customers", id, "invoices"])
+    this.router.navigate(["dashboard/customers", id, "invoices"])
   }
 
   navigateToPayments(id: number): void {
-    this.router.navigate(["/customers", id, "payments"])
+    this.router.navigate(["dashboard/customers", id, "payments"])
   }
 
   deleteCustomer(id: number): void {
